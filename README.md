@@ -3,6 +3,12 @@
 Development environment as code. Your dev env in a container with seamless X11 support. You get a gnome-terminal from
 where you can start additional windows and programs.
 
+In the screenshot below the black terminal window runs on the host. In that terminal, the development environment is
+started. That in turn opens the cream terminal window which lives inside the container. From the cream terminal I start
+xeyes and eclipse, seamlessly connecting to the X server on the host.
+
+![a screenshot of the containerized development environment](../media/devenv-screenshot.png?raw=true)
+
 ## Details
 
 Runs as a podman container (using an Ubuntu Jammy base image) on an Ubuntu Jammy host.
