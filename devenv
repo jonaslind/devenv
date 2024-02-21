@@ -1,0 +1,77 @@
+#! /bin/bash -e
+
+echo "Development Environment as Code!"
+echo "All your favorite stuff in a Dockerfile."
+echo ""
+
+if [[ ! -e ~/.config ]] ; then
+  # Atomically create the directory with the specified permissions. This is more secure than first creating a directory
+  # and then modifying its permissions.
+  (umask 0077 ; mkdir ~/.config)
+fi
+if [[ ! -e ~/.config/devenv ]] ; then
+  (umask 0077 ; mkdir ~/.config/devenv)
+fi
+
+if [[ ! -e ~/.config/devenv/fullname ]] ; then
+  fullnamedefault=$(getent passwd $USER | cut -d: -f5 | sed 's/,.*//')
+  read -e -i "$fullnamedefault" -p "Please enter your name (will be used for .gitconfig): " input
+  (umask 0077 ; touch ~/.config/devenv/fullname)
+  echo "$input" >> ~/.config/devenv/fullname
+fi
+fullname=$(cat ~/.config/devenv/fullname)
+
+if [[ ! -e ~/.config/devenv/email ]] ; then
+  read -e -p "Please enter your email (will be used for .gitconfig): " input
+  (umask 0077 ; touch ~/.config/devenv/email)
+  echo "$input" >> ~/.config/devenv/email
+fi
+email=$(cat ~/.config/devenv/email)
+
+uid=$(id -u)
+gid=$(id -g)
+
+echo "Building image"
+# The docker format is needed to be able to use the SHELL instruction in the Dockerfile
+podman build \
+  -t devenv \
+  -q \
+  --format docker \
+  --build-arg USERID="$uid" \
+  --build-arg GROUPID="$gid" \
+  --build-arg USERNAME="$USER" \
+  --build-arg FULLNAME="$fullname" \
+  --build-arg EMAIL="$email" \
+  .
+echo ""
+
+subuidSize=$(( $(podman info --format "{{ range .Host.IDMappings.UIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+subgidSize=$(( $(podman info --format "{{ range .Host.IDMappings.GIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+
+echo "Launching your development environment"
+podman run \
+  --rm \
+  -d \
+  -e DISPLAY \
+  --net=host \
+  -v $XAUTHORITY:/home/$USER/.Xauthority:z \
+  -v /run/user/$uid/podman/podman.sock:/run/user/$uid/podman/podman.sock \
+  -v /run/user/$uid/keyring/ssh:/run/user/$uid/keyring/ssh \
+  --uidmap $uid:0:1 \
+  --uidmap 0:1:$uid \
+  --uidmap $(($uid+1)):$(($uid+1)):$(($subuidSize-$uid)) \
+  --gidmap $gid:0:1 \
+  --gidmap 0:1:$gid \
+  --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid)) \
+  --mount type=bind,source=/home/$USER/Downloads,destination=/home/$USER/Downloads \
+  --mount type=bind,source=/home/$USER/.ssh,destination=/home/$USER/.ssh \
+  --mount type=volume,source=devenv-maven-cache,destination=/home/$USER/.m2/repository \
+  --mount type=volume,source=devenv-source-directory,destination=/home/$USER/source \
+  --mount type=volume,source=devenv-eclipse-config,destination=/home/$USER/.eclipse \
+  --mount type=volume,source=devenv-eclipse-workspace,destination=/home/$USER/eclipse-workspace \
+  --mount type=volume,source=devenv-java-user-preferences,destination=/home/$USER/.java \
+  --name devenv \
+  devenv
+echo ""
+
+echo "Enjoy!"
