@@ -1,4 +1,6 @@
 eclipse.preferences.version=1
+printMargin=true
+printMarginColumn=120
 showEnclosedIdeographicSpaces=false
 showEnclosedSpaces=false
 showLeadingIdeographicSpaces=false
