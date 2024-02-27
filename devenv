@@ -54,7 +54,7 @@ podman run \
   -d \
   -e DISPLAY \
   --net=host \
-  -v $XAUTHORITY:/home/$USER/.Xauthority:z \
+  -v $XAUTHORITY:/home/$USER/.Xauthority \
   -v /run/user/$uid/podman/podman.sock:/run/user/$uid/podman/podman.sock \
   -v /run/user/$uid/keyring/ssh:/run/user/$uid/keyring/ssh \
   --uidmap $uid:0:1 \
