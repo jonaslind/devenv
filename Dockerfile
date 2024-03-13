@@ -100,12 +100,12 @@ RUN \
 #
 # See above for detailed explanation about what's going on here. Here the cd command will save us in case the
 # substituted process fails.
-#
+# 
 RUN \
   cd /opt && \
-  curl -L https://ftp.acc.umu.se/mirror/eclipse.org/technology/epp/downloads/release/2023-12/R/eclipse-jee-2023-12-R-linux-gtk-x86_64.tar.gz | \
+  curl -L https://ftp.acc.umu.se/mirror/eclipse.org/technology/epp/downloads/release/2024-03/R/eclipse-jee-2024-03-R-linux-gtk-x86_64.tar.gz | \
     tee >(tar xz --no-same-owner -f-) | \
-    sha512sum -c <(echo "684e54d44e3ea815a9da75f4688cbcd0696bf02c542518483c61259350c6da5159d6e40eb56779aff170027b5714592789825d7a7f76cae10def5ea5fe98699b -") && \
+    sha512sum -c <(echo "d674d5eb95c4836440463a89dc8f849e45057d2f89e7b698c48f342c82e169d1ab6dc2c697654474c3ecd5625d04a593db3c1e06984d3596db1e86cabad1eb2f -") && \
   cd eclipse* && \
   ECLIPSEHOME=$(pwd) && \
   cd /usr/bin && \
@@ -278,10 +278,10 @@ COPY org.eclipse.jdt.ui.prefs           /home/$USERNAME/eclipse-workspace/.metad
 COPY org.eclipse.ui.editors.prefs       /home/$USERNAME/eclipse-workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.ui.editors.prefs
 COPY org.eclipse.wst.xml.core.prefs     /home/$USERNAME/eclipse-workspace/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.wst.xml.core.prefs
 RUN \
-  mkdir -p                                            ~/.eclipse/org.eclipse.platform_4.30.0_1473617060_linux_gtk_x86_64/configuration/.settings/
-COPY org.eclipse.ui.ide.prefs           /home/$USERNAME/.eclipse/org.eclipse.platform_4.30.0_1473617060_linux_gtk_x86_64/configuration/.settings/org.eclipse.ui.ide.prefs
+  mkdir -p                                            ~/.eclipse/org.eclipse.platform_4.31.0_1473617060_linux_gtk_x86_64/configuration/.settings/
+COPY org.eclipse.ui.ide.prefs           /home/$USERNAME/.eclipse/org.eclipse.platform_4.31.0_1473617060_linux_gtk_x86_64/configuration/.settings/org.eclipse.ui.ide.prefs
 RUN \
-  sed -i "s/%username%/$USERNAME/"      /home/$USERNAME/.eclipse/org.eclipse.platform_4.30.0_1473617060_linux_gtk_x86_64/configuration/.settings/org.eclipse.ui.ide.prefs
+  sed -i "s/%username%/$USERNAME/"      /home/$USERNAME/.eclipse/org.eclipse.platform_4.31.0_1473617060_linux_gtk_x86_64/configuration/.settings/org.eclipse.ui.ide.prefs
 
 # Prevent gnome-terminal from looking for accessibility tools
 ENV NO_AT_BRIDGE=1
