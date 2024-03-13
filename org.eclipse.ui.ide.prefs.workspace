@@ -2,5 +2,4 @@ eclipse.preferences.version=1
 platformState=
 quickStart=false
 tipsAndTricks=false
-//TODO: change to other strategy when https://github.com/eclipse-platform/eclipse.platform.ui/issues/1380 has made it into eclipse (probably in 2024-03 on Wednesday, March 13, 2024)
-unassociatedEditorStrategy=org.eclipse.ui.ide.textEditor
+unassociatedEditorStrategy=org.eclipse.ui.internal.genericeditor.genericTextEditor
