@@ -12,6 +12,9 @@ fi
 if [[ ! -e ~/.config/devenv ]] ; then
   (umask 0077 ; mkdir ~/.config/devenv)
 fi
+if [[ ! -e ~/.aws ]] ; then
+  (umask 0077 ; mkdir ~/.aws)
+fi
 
 if [[ ! -e ~/.config/devenv/fullname ]] ; then
   fullnamedefault=$(getent passwd $USER | cut -d: -f5 | sed 's/,.*//')
@@ -65,6 +68,7 @@ podman run \
   --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid)) \
   --mount type=bind,source=/home/$USER/Downloads,destination=/home/$USER/Downloads \
   --mount type=bind,source=/home/$USER/.ssh,destination=/home/$USER/.ssh \
+  --mount type=bind,source=/home/$USER/.aws,destination=/home/$USER/.aws \
   --mount type=volume,source=devenv-maven-cache,destination=/home/$USER/.m2/repository \
   --mount type=volume,source=devenv-source-directory,destination=/home/$USER/source \
   --mount type=volume,source=devenv-eclipse-config,destination=/home/$USER/.eclipse \

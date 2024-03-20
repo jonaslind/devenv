@@ -31,6 +31,7 @@ RUN apt update && apt upgrade -y && \
   gitk \
   gnome-icon-theme \
   gnome-terminal \
+  gpg \
   jq \
   libcanberra-gtk-module \
   libcanberra-gtk3-module \
@@ -134,6 +135,21 @@ RUN \
   ln -s ${NODEHOME}/bin/node node && \
   ln -s ${NODEHOME}/bin/npm npm && \
   ln -s ${NODEHOME}/bin/npx npx
+
+# AWS CLI
+RUN \
+  mkdir /tmp/aws-cli-install
+COPY aws-cli-pgp-key.pub /tmp/aws-cli-install/aws-cli-pgp-key.pub
+RUN \
+  cd /tmp/aws-cli-install && \
+  gpg --import aws-cli-pgp-key.pub && \
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip.sig" -o "awscliv2.sig" && \
+  gpg --verify awscliv2.sig awscliv2.zip && \
+  unzip awscliv2.zip && \
+  ./aws/install && \
+  cd / && \
+  rm -rf /tmp/aws-cli-install
 
 # Java Preferences Utility
 RUN \
@@ -267,7 +283,9 @@ RUN \
   mkdir ~/eclipse-workspace && \
   chmod 700 ~/eclipse-workspace && \
   mkdir ~/source && \
-  chmod 700 ~/source
+  chmod 700 ~/source && \
+  mkdir ~/.aws && \
+  chmod 700 ~/.aws
 
 # Eclipse preferences
 RUN \
