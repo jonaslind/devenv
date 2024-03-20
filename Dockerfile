@@ -1,11 +1,5 @@
 FROM ubuntu:jammy
 
-ARG USERID
-ARG GROUPID
-ARG USERNAME
-ARG FULLNAME
-ARG EMAIL
-
 # Use bash instead of sh to be able to use process substitution in RUN commands.
 SHELL ["/bin/bash", "-c"]
 
@@ -161,6 +155,10 @@ RUN \
   cd /usr/bin && \
   ln -s /opt/javaprefs/javauserprefadd javauserprefadd
 
+ARG USERID
+ARG GROUPID
+ARG USERNAME
+
 # Create the user
 RUN \
   groupadd -g $GROUPID $USERNAME && \
@@ -246,6 +244,8 @@ RUN \
   export GEM_HOME="/home/$USERNAME/gems" && \
   gem install jekyll bundler
 
+ARG BASHRC
+
 # Nice .bashrc and .profile
 RUN \
   touch ~/.bashrc && \
@@ -261,7 +261,11 @@ RUN \
   echo 'export PATH="$HOME/.local/bin:$HOME/gems/bin:$PATH"' >> ~/.bashrc && \
   echo 'export SSH_AUTH_SOCK=/run/user/'$USERID'/keyring/ssh' >> ~/.bashrc && \
   echo 'PS1='"'"'${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $CHEESE_WEDGE '"'"'' >> ~/.bashrc && \
-  echo 'cd $HOME' >> ~/.bashrc
+  echo 'cd $HOME' >> ~/.bashrc && \
+  echo "$BASHRC" >> ~/.bashrc
+
+ARG FULLNAME
+ARG EMAIL
 
 # Git config
 RUN \

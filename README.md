@@ -13,13 +13,18 @@ xeyes and eclipse, seamlessly connecting to the X server on the host.
 
 Runs as a podman container (using an Ubuntu Jammy base image) on an Ubuntu Jammy host.
 
-Your `~/.ssh` and `~/Downloads` are mounted into the container.
+Your `~/.ssh`, `~/.aws` and `~/Downloads` are mounted into the container.
 
 The Podman socket is mounted into the container, so you can interact with the host's podman daemon using the podman
 client inside the container.
 
 The `~/source` directory in the container is mounted to a volume, so your work there will survive stops and starts of
 the container.
+
+After having started the dev env once, you can edit `~/.config/devenv/bashrc` to define additional lines to add at the
+end of the `~/.bashrc` inside the container. For example, if you have an IP address in your network that you want to
+store in an environment variable, the `~/.config/devenv/bashrc` is a good place to put such variables. Avoid putting
+secrets in there, the contents will be visible in docker image metadata.
 
 ## Security considerations
 

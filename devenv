@@ -31,6 +31,17 @@ if [[ ! -e ~/.config/devenv/email ]] ; then
 fi
 email=$(cat ~/.config/devenv/email)
 
+if [[ ! -e ~/.config/devenv/bashrc ]] ; then
+  (umask 0077 ; touch ~/.config/devenv/bashrc)
+  echo "# The contents of this file will be added at the end of the ~/.bashrc inside" >> ~/.config/devenv/bashrc
+  echo "# the development environment. This is not intended for secrets but rather" >> ~/.config/devenv/bashrc
+  echo "# environment values that you don't want to commit to the git repo. An example" >> ~/.config/devenv/bashrc
+  echo "# could be a specific IP address in your network that you want to reference as" >> ~/.config/devenv/bashrc
+  echo "# an environment variable. The contents of this file will be visible in plain" >> ~/.config/devenv/bashrc
+  echo "# text in the docker image metadata." >> ~/.config/devenv/bashrc
+fi
+bashrc=$(cat ~/.config/devenv/bashrc)
+
 uid=$(id -u)
 gid=$(id -g)
 
@@ -45,6 +56,7 @@ podman build \
   --build-arg USERNAME="$USER" \
   --build-arg FULLNAME="$fullname" \
   --build-arg EMAIL="$email" \
+  --build-arg BASHRC="$bashrc" \
   .
 echo ""
 
