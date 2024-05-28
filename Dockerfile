@@ -71,9 +71,9 @@ RUN \
 # saved by the mv command which WILL fail if the tar command didn't manage to extract the file.
 RUN \
   cd /usr/bin && \
-  curl -L https://github.com/mikefarah/yq/releases/download/v4.40.5/yq_linux_amd64.tar.gz | \
+  curl -L https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64.tar.gz | \
     tee >(tar xz --no-same-owner -f- ./yq_linux_amd64) | \
-    sha512sum -c <(echo "33d0f3a96dcbe0f4382eb7087850ee7678999fc1a3c760a0b908d5d0fae82fc9df76651957cdd80eb880f8ec7c461f953f5109ab6db551518e495a1af2d63862 -") && \
+    sha512sum -c <(echo "e38c2398445624e3d5b1f854fe805bd575723d0b35bfcf8c0f52749a9abddfcbbbf5ba5ba251a2623987c4be329877ad4bafb9a1e0e312bcf6cc45405741ae5c -") && \
   mv yq_linux_amd64 yq
 
 # Maven
@@ -83,9 +83,9 @@ RUN \
 #
 RUN \
   cd /opt && \
-  curl -L https://dlcdn.apache.org/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz | \
+  curl -L https://dlcdn.apache.org/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz | \
     tee >(tar xz --no-same-owner -f-) | \
-    sha512sum -c <(echo "706f01b20dec0305a822ab614d51f32b07ee11d0218175e55450242e49d2156386483b506b3a4e8a03ac8611bae96395fd5eec15f50d3013d5deed6d1ee18224 -") && \
+    sha512sum -c <(echo "f64913f89756264f2686e241f3f4486eca5d0dfdbb97077b0efc389cad376053824d58caa35c39648453ca58639f85335f9be9c8f217bfdb0c2d5ff2a9428fac -") && \
   cd apache-maven-* && \
   MAVENHOME=$(pwd) && \
   cd /usr/bin && \
@@ -119,9 +119,9 @@ RUN \
 # Node.js
 RUN \
   cd /opt && \
-  curl -L https://nodejs.org/dist/v20.11.0/node-v20.11.0-linux-x64.tar.gz | \
+  curl -L https://nodejs.org/dist/v20.13.1/node-v20.13.1-linux-x64.tar.gz | \
     tee >(tar xz --no-same-owner -f-) | \
-    sha256sum -c <(echo "9556262f6cd4c020af027782afba31ca6d1a37e45ac0b56cecd2d5a4daf720e0 -") && \
+    sha256sum -c <(echo "80b978a9fe544b1892e73a4bf89e0b3792b1d459b621874efdc2ddd2270c03fe -") && \
   cd node-* && \
   NODEHOME=$(pwd) && \
   cd /usr/bin && \
