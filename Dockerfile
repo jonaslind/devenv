@@ -165,6 +165,26 @@ RUN \
   cd / && \
   rm -rf /tmp/xidel-install
 
+# Minikube
+RUN \
+  mkdir /tmp/minikube-install && \
+  cd /tmp/minikube-install && \
+  curl -L https://storage.googleapis.com/minikube/releases/v1.37.0/minikube_1.37.0-0_amd64.deb --output minikube_1.37.0-0_amd64.deb && \
+  sha512sum -c <(echo "8c08727dc0e18489e25af4518a2273ecd727588cc9e836288de1cf9a415b3fe5621d39fe871bc845e86a558791b832b983a8bc673cc2cc10ee57b97a11dc5ec0 minikube_1.37.0-0_amd64.deb") && \
+  dpkg -i minikube_1.37.0-0_amd64.deb && \
+  cd / && \
+  rm -rf /tmp/minikube-install
+
+# Kubectl
+RUN \
+  mkdir /tmp/kubectl-install && \
+  cd /tmp/kubectl-install && \
+  curl -L https://dl.k8s.io/release/v1.34.1/bin/linux/amd64/kubectl --output kubectl && \
+  sha512sum -c <(echo "bc4f4c98a2c4f7d872e5a8024dd0f47f73e1a5a6c8b833f265e7453c3c31f23555c3df1d921c5b3e8a0f6a1aae4954f0b5141db9c396c4206c947206eb34a398 kubectl") && \
+  install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+  cd / && \
+  rm -rf /tmp/kubectl-install
+
 ARG USERID
 ARG GROUPID
 ARG USERNAME
@@ -176,6 +196,10 @@ RUN \
   chown -R $USERNAME:$USERNAME /home/$USERNAME
 
 USER $USERNAME
+
+# Minikube configuration
+RUN \
+  minikube config set rootless true
 
 # JMeter and Custom Thread Groups plugin
 # Must be installed as user, not root, otherwise plugin manager won't work with Taurus.
@@ -277,6 +301,7 @@ RUN \
   echo 'export PATH="$HOME/.local/bin:$HOME/gems/bin:~/.python/venvs/default/bin:$PATH"' >> ~/.bashrc && \
   echo 'export SSH_AUTH_SOCK=/run/user/'$USERID'/keyring/ssh' >> ~/.bashrc && \
   echo 'export CONTAINER_HOST="unix:///run/user/1000/podman/podman.sock"' >> ~/.bashrc && \
+  echo 'source <(kubectl completion bash)' >> ~/.bashrc && \
   echo 'PS1='"'"'${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $CHEESE_WEDGE '"'"'' >> ~/.bashrc && \
   echo 'cd $HOME' >> ~/.bashrc && \
   echo "$BASHRC" >> ~/.bashrc
