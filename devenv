@@ -15,6 +15,12 @@ fi
 if [[ ! -e ~/.aws ]] ; then
   (umask 0077 ; mkdir ~/.aws)
 fi
+if [[ ! -e ~/.aws ]] ; then
+  (umask 0077 ; mkdir ~/.aws)
+fi
+if [[ ! -e ~/Data ]] ; then
+  (umask 0022 ; mkdir ~/Data)
+fi
 
 if [[ ! -e ~/.config/devenv/fullname ]] ; then
   fullnamedefault=$(getent passwd $USER | cut -d: -f5 | sed 's/,.*//')
@@ -78,6 +84,7 @@ podman run \
   --gidmap $gid:0:1 \
   --gidmap 0:1:$gid \
   --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid)) \
+  --mount type=bind,source=/home/$USER/Data,destination=/home/$USER/Data \
   --mount type=bind,source=/home/$USER/Downloads,destination=/home/$USER/Downloads \
   --mount type=bind,source=/home/$USER/.ssh,destination=/home/$USER/.ssh \
   --mount type=bind,source=/home/$USER/.aws,destination=/home/$USER/.aws \

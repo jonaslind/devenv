@@ -83,9 +83,9 @@ RUN \
 #
 RUN \
   cd /opt && \
-  curl -L https://dlcdn.apache.org/maven/maven-3/3.9.7/binaries/apache-maven-3.9.7-bin.tar.gz | \
+  curl -L https://dlcdn.apache.org/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.tar.gz | \
     tee >(tar xz --no-same-owner -f-) | \
-    sha512sum -c <(echo "f64913f89756264f2686e241f3f4486eca5d0dfdbb97077b0efc389cad376053824d58caa35c39648453ca58639f85335f9be9c8f217bfdb0c2d5ff2a9428fac -") && \
+    sha512sum -c <(echo "bcfe4fe305c962ace56ac7b5fc7a08b87d5abd8b7e89027ab251069faebee516b0ded8961445d6d91ec1985dfe30f8153268843c89aa392733d1a3ec956c9978 -") && \
   cd apache-maven-* && \
   MAVENHOME=$(pwd) && \
   cd /usr/bin && \
@@ -98,7 +98,7 @@ RUN \
 # 
 RUN \
   cd /opt && \
-  curl -L https://ftp.acc.umu.se/mirror/eclipse.org/technology/epp/downloads/release/2024-03/R/eclipse-jee-2024-03-R-linux-gtk-x86_64.tar.gz | \
+  curl -L https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2024-03/R/eclipse-jee-2024-03-R-linux-gtk-x86_64.tar.gz | \
     tee >(tar xz --no-same-owner -f-) | \
     sha512sum -c <(echo "d674d5eb95c4836440463a89dc8f849e45057d2f89e7b698c48f342c82e169d1ab6dc2c697654474c3ecd5625d04a593db3c1e06984d3596db1e86cabad1eb2f -") && \
   cd eclipse* && \
@@ -154,6 +154,16 @@ RUN \
   chmod 755 /opt/javaprefs/javauserprefadd && \
   cd /usr/bin && \
   ln -s /opt/javaprefs/javauserprefadd javauserprefadd
+
+# Xidel
+RUN \
+  mkdir /tmp/xidel-install && \
+  curl -L https://github.com/benibela/xidel/releases/download/Xidel_0.9.8/xidel-0.9.8.linux64.tar.gz | \
+    tee >(tar xz --no-same-owner -f-) | \
+    sha512sum -c <(echo "b4050dd198e7d5f35fc28fe0fb64246ddd85bb511a51b368fc6316082a1feb397137e07cd22d5e110fd233a600d078eb9122a50529d08c8c0d04e0bbf09e8113 -") && \
+  cp xidel /usr/bin/. && \
+  cd / && \
+  rm -rf /tmp/xidel-install
 
 ARG USERID
 ARG GROUPID
@@ -274,6 +284,8 @@ RUN \
 
 # Mount points
 RUN \
+  mkdir ~/Data && \
+  chmod 755 ~/Data && \
   mkdir ~/Downloads && \
   chmod 755 ~/Downloads && \
   mkdir ~/.ssh && \
