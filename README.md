@@ -11,7 +11,7 @@ xeyes and eclipse, seamlessly connecting to the X server on the host.
 
 ## Details
 
-Runs as a podman container (using an Ubuntu Jammy base image) on an Ubuntu Jammy host.
+Runs as a podman container (using an Ubuntu Noble base image) on an Ubuntu Noble host.
 
 Your `~/.ssh`, `~/.aws` and `~/Downloads` are mounted into the container.
 
@@ -41,7 +41,7 @@ subordinate UID on your host.
 - Git (`sudo apt install git`)
 - Podman (`sudo apt install podman`)
 
-This has only been tested on an Ubuntu Jammy host.
+This has only been tested on an Ubuntu Noble host.
 
 ## Getting started
 

@@ -1,7 +1,10 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 # Use bash instead of sh to be able to use process substitution in RUN commands.
 SHELL ["/bin/bash", "-c"]
+
+# Remove default ubuntu user
+RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu
 
 # Install software!
 #
@@ -34,7 +37,7 @@ RUN apt update && apt upgrade -y && \
   libxslt-dev \
   meld \
   net-tools \
-  netcat \
+  netcat-openbsd \
   openjdk-21-jdk \
   openjdk-21-source \
   podman \
@@ -42,6 +45,7 @@ RUN apt update && apt upgrade -y && \
   python3-dev \
   python3-pip \
   python3-tk \
+  python3-venv \
   ruby-full \
   sudo \
   unzip \
@@ -56,10 +60,6 @@ RUN \
   mv /usr/bin/podman /usr/bin/podman-local && \
   echo -e '#!/bin/bash\npodman-local --remote "$@"\nexit $?' > /usr/bin/podman && \
   chmod 755 /usr/bin/podman
-
-# Make sure we're using the latest pip
-RUN \
-  pip install --upgrade pip wheel setuptools Cython
 
 # Yq is not published in any apt repo that I trust, so let's take it directly from github.
 #
@@ -202,8 +202,18 @@ RUN \
 RUN \
   javauserprefadd "/org/apache/jmeter/gui/action" "laf.command" "com.github.weisj.darklaf.DarkLaf:com.github.weisj.darklaf.theme.SolarizedDarkTheme"
 
+# Default venv for python
+RUN \
+  python3 -m venv ~/.python/venvs/default
+  
+# Make sure we're using the latest pip
+  RUN \
+  export PATH="~/.python/venvs/default/bin:$PATH" && \
+  pip install --upgrade pip wheel setuptools Cython
+
 # Taurus
 RUN \
+  export PATH="~/.python/venvs/default/bin:$PATH" && \
   pip install bzt
 
 # Taurus settings
@@ -245,10 +255,6 @@ RUN \
   cd /tmp && \
   rm -rf dircolors-solarized
 
-# Make podman connect to the podman running on the host by default
-RUN \
-  podman system connection add host unix:///run/user/1000/podman/podman.sock
-
 # Jekyll
 RUN \
   export GEM_HOME="/home/$USERNAME/gems" && \
@@ -268,8 +274,9 @@ RUN \
   echo 'export WEBKIT_DISABLE_COMPOSITING_MODE=1' >> ~/.bashrc  && \
   echo 'export TZ="Europe/Stockholm"' >> ~/.bashrc  && \
   echo 'export GEM_HOME="$HOME/gems"' >> ~/.bashrc && \
-  echo 'export PATH="$HOME/.local/bin:$HOME/gems/bin:$PATH"' >> ~/.bashrc && \
+  echo 'export PATH="$HOME/.local/bin:$HOME/gems/bin:~/.python/venvs/default/bin:$PATH"' >> ~/.bashrc && \
   echo 'export SSH_AUTH_SOCK=/run/user/'$USERID'/keyring/ssh' >> ~/.bashrc && \
+  echo 'export CONTAINER_HOST="unix:///run/user/1000/podman/podman.sock"' >> ~/.bashrc && \
   echo 'PS1='"'"'${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $CHEESE_WEDGE '"'"'' >> ~/.bashrc && \
   echo 'cd $HOME' >> ~/.bashrc && \
   echo "$BASHRC" >> ~/.bashrc
