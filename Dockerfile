@@ -71,9 +71,9 @@ RUN \
 # saved by the mv command which WILL fail if the tar command didn't manage to extract the file.
 RUN \
   cd /usr/bin && \
-  curl -L https://github.com/mikefarah/yq/releases/download/v4.44.1/yq_linux_amd64.tar.gz | \
+  curl -L https://github.com/mikefarah/yq/releases/download/v4.53.2/yq_linux_amd64.tar.gz | \
     tee >(tar xz --no-same-owner -f- ./yq_linux_amd64) | \
-    sha512sum -c <(echo "e38c2398445624e3d5b1f854fe805bd575723d0b35bfcf8c0f52749a9abddfcbbbf5ba5ba251a2623987c4be329877ad4bafb9a1e0e312bcf6cc45405741ae5c -") && \
+    sha512sum -c <(echo "0d197c8ac4437d4be7fbf40148e02baebc624c3d1564230ef972390bb7e13da87e2ab94d0243c5e1cfedbc980526cfdf2142b09efc282219d374a196d2619297 -") && \
   mv yq_linux_amd64 yq
 
 # Maven
@@ -83,9 +83,9 @@ RUN \
 #
 RUN \
   cd /opt && \
-  curl -L https://dlcdn.apache.org/maven/maven-3/3.9.11/binaries/apache-maven-3.9.11-bin.tar.gz | \
+  curl -L https://dlcdn.apache.org/maven/maven-3/3.9.15/binaries/apache-maven-3.9.15-bin.tar.gz | \
     tee >(tar xz --no-same-owner -f-) | \
-    sha512sum -c <(echo "bcfe4fe305c962ace56ac7b5fc7a08b87d5abd8b7e89027ab251069faebee516b0ded8961445d6d91ec1985dfe30f8153268843c89aa392733d1a3ec956c9978 -") && \
+    sha512sum -c <(echo "33d81e0ec785f0207e3e5e3ffb61863e1dca5784c15ac3fb5ff105f69cffbea484eb8d473ea60467a63f7b0570eef8622f2fed8eee96acbe668aa313391cddb3 -") && \
   cd apache-maven-* && \
   MAVENHOME=$(pwd) && \
   cd /usr/bin && \
@@ -98,9 +98,9 @@ RUN \
 # 
 RUN \
   cd /opt && \
-  curl -L https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2024-03/R/eclipse-jee-2024-03-R-linux-gtk-x86_64.tar.gz | \
+  curl -L 'https://www.eclipse.org/downloads/download.php?file=/technology/epp/downloads/release/2026-03/R/eclipse-jee-2026-03-R-linux-gtk-x86_64.tar.gz&r=1' | \
     tee >(tar xz --no-same-owner -f-) | \
-    sha512sum -c <(echo "d674d5eb95c4836440463a89dc8f849e45057d2f89e7b698c48f342c82e169d1ab6dc2c697654474c3ecd5625d04a593db3c1e06984d3596db1e86cabad1eb2f -") && \
+    sha512sum -c <(echo "2fd59ada93f8e4aa38feb3ef6dfc82165e8be7f5b5c86140d5426264246f185a0cc48e80fc06b7c4ef7a356a56ece91a2a7df859f545ce9d2bb2f1337986581d -") && \
   cd eclipse* && \
   ECLIPSEHOME=$(pwd) && \
   cd /usr/bin && \
