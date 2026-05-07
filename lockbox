@@ -1,0 +1,104 @@
+#! /bin/bash -e
+
+echo "Development Environment as Code!"
+echo "All your favorite stuff in a Dockerfile."
+echo "This is the Lockbox environment"
+echo ""
+
+
+if [[ ! -e ~/lockbox ]] ; then
+  # Atomically create the directory with the specified permissions. This is more secure than first creating a directory
+  # and then modifying its permissions.
+  (umask 0077 ; mkdir ~/lockbox)
+fi
+if [[ ! -e ~/lockbox/.config ]] ; then
+  # Atomically create the directory with the specified permissions. This is more secure than first creating a directory
+  # and then modifying its permissions.
+  (umask 0077 ; mkdir ~/lockbox/.config)
+fi
+if [[ ! -e ~/lockbox/.config/devenv ]] ; then
+  (umask 0077 ; mkdir ~/lockbox/.config/devenv)
+fi
+if [[ ! -e ~/lockbox/.aws ]] ; then
+  (umask 0077 ; mkdir ~/lockbox/.aws)
+fi
+if [[ ! -e ~/lockbox/.aws ]] ; then
+  (umask 0077 ; mkdir ~/lockbox/.aws)
+fi
+if [[ ! -e ~/lockbox/Data ]] ; then
+  (umask 0022 ; mkdir ~/lockbox/Data)
+fi
+
+if [[ ! -e ~/lockbox/.config/devenv/fullname ]] ; then
+  fullnamedefault=$(getent passwd $USER | cut -d: -f5 | sed 's/,.*//')
+  read -e -i "$fullnamedefault" -p "Please enter your name (will be used for .gitconfig): " input
+  (umask 0077 ; touch ~/lockbox/.config/devenv/fullname)
+  echo "$input" >> ~/lockbox/.config/devenv/fullname
+fi
+fullname=$(cat ~/lockbox/.config/devenv/fullname)
+
+if [[ ! -e ~/lockbox/.config/devenv/email ]] ; then
+  read -e -p "Please enter your email (will be used for .gitconfig): " input
+  (umask 0077 ; touch ~/lockbox/.config/devenv/email)
+  echo "$input" >> ~/lockbox/.config/devenv/email
+fi
+email=$(cat ~/lockbox/.config/devenv/email)
+
+if [[ ! -e ~/lockbox/.config/devenv/bashrc ]] ; then
+  (umask 0077 ; touch ~/lockbox/.config/devenv/bashrc)
+  echo "# The contents of this file will be added at the end of the ~/lockbox/.bashrc inside" >> ~/lockbox/.config/devenv/bashrc
+  echo "# the development environment. This is not intended for secrets but rather" >> ~/lockbox/.config/devenv/bashrc
+  echo "# environment values that you don't want to commit to the git repo. An example" >> ~/lockbox/.config/devenv/bashrc
+  echo "# could be a specific IP address in your network that you want to reference as" >> ~/lockbox/.config/devenv/bashrc
+  echo "# an environment variable. The contents of this file will be visible in plain" >> ~/lockbox/.config/devenv/bashrc
+  echo "# text in the docker image metadata." >> ~/lockbox/.config/devenv/bashrc
+fi
+bashrc=$(cat ~/lockbox/.config/devenv/bashrc)
+
+uid=$(id -u)
+gid=$(id -g)
+
+echo "Building image"
+# The docker format is needed to be able to use the SHELL instruction in the Dockerfile
+podman build \
+  -t lockbox \
+  -f Dockerfile.lockbox \
+  -q \
+  --format docker \
+  --build-arg USERID="$uid" \
+  --build-arg GROUPID="$gid" \
+  --build-arg USERNAME="$USER" \
+  --build-arg FULLNAME="$fullname" \
+  --build-arg EMAIL="$email" \
+  --build-arg BASHRC="$bashrc" \
+  .
+echo ""
+
+subuidSize=$(( $(podman info --format "{{ range .Host.IDMappings.UIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+subgidSize=$(( $(podman info --format "{{ range .Host.IDMappings.GIDMap }}+{{.Size }}{{end }}" ) - 1 ))
+
+echo "Launching your development environment"
+podman run \
+  --rm \
+  -d \
+  -e DISPLAY \
+  --net=host \
+  -v $XAUTHORITY:/home/$USER/.Xauthority \
+  -v /run/user/$uid/podman/podman.sock:/run/user/$uid/podman/podman.sock \
+  --uidmap $uid:0:1 \
+  --uidmap 0:1:$uid \
+  --uidmap $(($uid+1)):$(($uid+1)):$(($subuidSize-$uid)) \
+  --gidmap $gid:0:1 \
+  --gidmap 0:1:$gid \
+  --gidmap $(($gid+1)):$(($gid+1)):$(($subgidSize-$gid)) \
+  --mount type=bind,source=/home/$USER/lockbox/Data,destination=/home/$USER/Data \
+  --mount type=volume,source=devenv-lockbox-maven-cache,destination=/home/$USER/.m2/repository \
+  --mount type=volume,source=devenv-lockbox-source-directory,destination=/home/$USER/source \
+  --mount type=volume,source=devenv-lockbox-eclipse-config,destination=/home/$USER/.eclipse \
+  --mount type=volume,source=devenv-lockbox-eclipse-workspace,destination=/home/$USER/eclipse-workspace \
+  --mount type=volume,source=devenv-lockbox-java-user-preferences,destination=/home/$USER/.java \
+  --name lockbox \
+  lockbox
+echo ""
+
+echo "Enjoy!"
